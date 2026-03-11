@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Hub</title>
+  <style>
+    :root{
+      --bg:#0b0b0b;
+      --panel:#111;
+      --text:#fff;
+      --accent:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family: "Yu Gothic","Noto Sans JP",sans-serif}
+    .wrap{max-width:900px;margin:36px auto;padding:20px}
+    header{margin-bottom:18px}
+    h1{margin:0 0 6px 0;font-size:20px}
+    p.lead{margin:0;color:#bbb;font-size:14px}
+    nav{margin-top:18px;background:var(--panel);padding:12px;border-radius:8px}
+    ul.links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    ul.links a{display:block;padding:10px 12px;color:var(--accent);text-decoration:none;border-radius:6px;background:rgba(255,255,255,0.01)}
+    ul.links a:hover{background:rgba(255,255,255,0.03)}
+    footer{margin-top:18px;color:#888;font-size:13px;text-align:right}
+    @media(min-width:640px){
+      ul.links{flex-direction:row;flex-wrap:wrap;gap:10px}
+      ul.links a{min-width:160px;text-align:center}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Project Hub</h1>
+      <p class="lead">各ページへのリンクです。</p>
+    </header>
+
+    <nav>
+      <ul class="links">
+        <li><a href="Web.html">阪神算</a></li>
+        <li><a href="README.md">README</a></li>
+      </ul>
+    </nav>
+
+    <footer>
+      <small>© Your Project</small>
+    </footer>
+  </div>
+</body>
+</html>
