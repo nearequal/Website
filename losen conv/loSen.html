@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>loSen conv</title>
+    <style>
+        /* フォント設定 */
+        @font-face {
+            font-family: 'MyConLangFont';
+            src: url('losen3.woff2') format('woff2');
+        }
+
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background: #1a1a2e; color: #e0e0e0; }
+        .container { background: #16213e; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #0f3460; }
+        h1 { text-align: center; color: #4ecca3; border-bottom: 2px solid #4ecca3; padding-bottom: 15px; }
+        
+        /* 入力エリア：独自フォント適用 & 赤線なし */
+        textarea { 
+            font-family: 'MyConLangFont', 'Helvetica Neue', Arial, sans-serif;
+            width: 100%; height: 120px; margin: 20px 0; font-size: 1.3em; padding: 15px; border: none; border-radius: 8px; box-sizing: border-box; background: #e0e0e0; color: #1a1a2e; 
+        }
+
+        /* 出力エリア：IPAが読めるように標準フォントで固定 */
+        #output { 
+            background: #0f3460; padding: 25px; border-left: 8px solid #4ecca3; font-size: 1.8em; min-height: 80px; border-radius: 8px; line-height: 1.8; color: #4ecca3; word-wrap: break-word; white-space: pre-wrap; 
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        .rule-box { margin-top: 30px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; font-size: 0.9em; line-height: 1.6; border: 1px solid #0f3460; }
+        .rule-title { color: #4ecca3; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #4ecca3; display: inline-block; }
+        .accent { color: #f1c40f; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>ConLang IPA Converter</h1>
+    
+    <!-- ボタンを削除し、spellcheck="false" を追加 -->
+    <textarea id="input" spellcheck="false" placeholder="入力を開始..."></textarea>
+    <div id="output"></div>
+
+    <div class="rule-box">
+        <div class="rule-title">【基本アルファベット & 入力ルール】</div><br>
+        ・<span class="accent">S</span> / <span class="accent">s</span> : 大文字Sは š [ʃ] <br>
+        ・<span class="accent">C</span> : 大文字Cのみ č [tʃ] として機能。<br>
+        ・<span class="accent">m</span> : 舌唇鼻音 [n̼] (上唇に舌を当てる音)<br>
+
+        <div class="rule-title">【母音：第一母音優先の原則】</div><br>
+        単語の最初に出現する母音は <span class="accent">二重母音または長音</span> となる：<br>
+        a → [eɪ], i → [aɪ], e → [iː], o → [oʊ]<br>
+        二番目以降の母音は <span class="accent">通常音</span>：<br>
+        a → [aː], i → [ɪ], e → [e], o → [oː]<br><br>
+
+        <div class="rule-title">【特殊：語尾の有声化】</div><br>
+        語尾が「有声子音（<span class="accent">b, d, g, z</span>）」＋「無声子音」で終わる場合、最後の文字を <span class="accent">有声化</span> する。<br>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+
+    const convertWord = (word) => {
+        if (!word) return "";
+        const hasUpper = /[A-Z]/.test(word);
+        
+        let res = word
+            .replace(/S/g, "ʃ")
+            .replace(/C/g, "tʃ")
+            .replace(/m/g, "n̼")
+            .replace(/[uU]/g, "");
+
+        const trigger = "bdgz";
+        if (res.length >= 2) {
+            let last = res.slice(-1);
+            let prev = res.slice(-2, -1);
+            if (trigger.includes(prev)) {
+                const map = { 'p':'b', 't':'d', 'k':'g', 'f':'v', 'ʃ':'ʒ', 's':'z', 'tʃ':'dʒ' };
+                if (map[last]) res = res.slice(0, -1) + map[last];
+            }
+        }
+
+        let firstVowelFound = false;
+        let finalIpa = "";
+        for (let i = 0; i < res.length; i++) {
+            let char = res[i].toLowerCase();
+            if (/[aeio]/.test(char) && !firstVowelFound) {
+                if (char === 'a') finalIpa += "eɪ";
+                else if (char === 'i') finalIpa += "aɪ";
+                else if (char === 'e') finalIpa += "iː";
+                else if (char === 'o') finalIpa += "oʊ";
+                firstVowelFound = true;
+            } else {
+                if (char === 'a') finalIpa += "aː";
+                else if (char === 'i') finalIpa += "ɪ";
+                else if (char === 'e') finalIpa += "eː";
+                else if (char === 'o') finalIpa += "oː";
+                else if (res[i] !== 'c') finalIpa += res[i];
+            }
+        }
+        return finalIpa;
+    };
+
+    input.addEventListener('input', () => {
+        let segments = input.value.split(/([ \n.,!?])/);
+        output.innerText = segments.map(seg => {
+            if (/[ \n.,!?]/.test(seg)) return seg;
+            if (/[a-zA-Z]/.test(seg)) return convertWord(seg);
+            return seg;
+        }).join("");
+    });
+</script>
+</body>
+</html>
